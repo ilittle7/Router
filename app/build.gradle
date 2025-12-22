@@ -1,0 +1,88 @@
+//apply plugin: 'com.android.application'
+//apply plugin: 'org.jetbrains.kotlin.android'
+//apply plugin: 'kotlin-kapt'
+//apply plugin: 'com.bybutter.router'
+//apply plugin: com.bybutter.router.RouterPlugin3
+
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("kotlin-kapt")
+    id("io.github.ilittle7.router") version "1.2.5" // 测试插件
+}
+
+//router {
+//    debug true
+//}
+
+android {
+    namespace = "com.ilittle7.router"
+    signingConfigs {
+        config {
+            keyAlias 'by.butter'
+            keyPassword 'by.butter'
+            storeFile file('keystore/butter.keystore')
+            storePassword 'by.butter'
+        }
+    }
+    compileSdk compile_sdk
+    defaultConfig {
+        applicationId rootProject.ext.application_id
+        minSdk rootProject.ext.min_sdk
+        targetSdk rootProject.ext.target_sdk
+        versionCode 1
+        versionName "1.0"
+
+        signingConfig signingConfigs.config
+    }
+    buildTypes {
+        debug {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir "${buildDir.absolutePath}/generated/source/kaptKotlin/"
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation project(':router-lib')
+    implementation project(':router-annotation')
+    kapt project(':router-processor')
+    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.7.0"
+//    implementation 'io.github.ilittle7:router-lib:1.2.6'
+//    implementation 'io.github.ilittle7:router-annotation:1.2.6'
+//    kapt 'io.github.ilittle7:router-processor:1.2.6'
+    implementation project(':testmodule')
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1'
+
+    implementation 'com.jakewharton.timber:timber:4.7.1'
+//    implementation 'com.suika:AndroidStudioTree:1.0.0'
+//    lintChecks project(path: ':router-lint')
+
+//    def anko_version = '0.10.8'
+//    implementation "org.jetbrains.anko:anko:$anko_version"
+}

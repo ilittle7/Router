@@ -1,0 +1,120 @@
+// 1. buildscript 必须在最前
+buildscript {
+    ext {
+        kotlin_version = "1.9.0"
+        agp_version = '7.4.2'
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:$agp_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+// 2. plugins 块紧随其后
+plugins {
+    id("com.google.devtools.ksp") version "1.8.20-1.0.10" apply false
+    id 'org.jetbrains.kotlin.jvm' version '1.9.0' apply false
+}
+
+ext {
+    application_id = "com.ilittle7.router"
+
+    publish_version = '1.3.2'
+    publish_group = "io.github.ilittle7"
+
+    // 显式定义子模块找不到的变量
+    kotlin_stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.0"
+    kotlin_reflect = "org.jetbrains.kotlin:kotlin-reflect:1.9.0"
+
+    compile_sdk = 34
+    min_sdk = 19
+    target_sdk = 34
+
+    // 这里定义函数时，在 Groovy 中建议使用 Closure 语法
+    customizePom = { pom ->
+        pom.with {
+            name = project.name
+            description = 'A lightweight Android Router framework'
+            url = 'https://github.com/ilittle7/Router'
+            licenses {
+                license {
+                    name = 'The Apache License, Version 2.0'
+                    url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            developers {
+                developer {
+                    id = 'ilittle7'
+                    name = 'ilittle7'
+                    email = 'ilittle7@163.com'
+                }
+            }
+            scm {
+                connection = 'scm:git:github.com/ilittle7/Router.git'
+                developerConnection = 'scm:git:ssh://github.com/ilittle7/Router.git'
+                url = 'https://github.com/ilittle7/Router'
+            }
+        }
+    }
+}
+
+// 4. subprojects (发布逻辑放在这里)
+subprojects {
+    // 确保这里没有写错
+    if (project.name.startsWith("router-")) {
+        apply plugin: 'maven-publish'
+        apply plugin: 'signing'
+
+        group = rootProject.ext.publish_group
+        version = rootProject.ext.publish_version
+
+
+//        publishing {
+//            repositories {
+//                maven {
+//                    name = "OSSRH"
+//                    url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+//                    credentials {
+//                        // 使用 findProperty 安全读取，防止本地没有配置时直接崩掉
+//                        username = project.findProperty("ossrhUsername") ?: ""
+//                        password = project.findProperty("ossrhPassword") ?: ""
+//                    }
+//                }
+//            }
+//        }
+        publishing {
+            repositories {
+                maven {
+                    name = "LocalBundle"
+                    // 修改这里：发布到根目录下的 bundleRepo 文件夹
+                    url = uri("${rootProject.projectDir}/bundleRepo")
+                }
+            }
+        }
+
+        signing {
+            // 只有当存在相关属性时才签名，防止在没有 GPG 的机器上编译失败
+            required { project.hasProperty("signing.keyId") }
+            sign publishing.publications
+        }
+    }
+}
+
+// 在根目录 build.gradle 的末尾
+task checkCredentials {
+    doLast {
+        println "Username: ${rootProject.findProperty('ossrhUsername')}"
+        // 打印密码长度以验证是否存在且不暴露密码
+        def pass = rootProject.findProperty('ossrhPassword')
+        println "Password Length: ${pass ? pass.length() : 0}"
+    }
+}
+
+// 5. 其他 Task
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
