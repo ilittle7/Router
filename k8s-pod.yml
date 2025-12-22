@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+    - name: jnlp
+      image: 'jenkins/jnlp-slave:alpine'
+      volumeMounts:
+        - name: github-mirror
+          mountPath: /github-mirror
+    - name: gradle
+      image: 's3bb0jg1.mirror.aliyuncs.com/library/gradle:6.7-jdk8'
+      command: ['cat']
+      tty: true
+      env:
+        - name: ANDROID_SDK_ROOT
+          value: /android-workspace/android-sdk
+        - name: JAVA_OPTS
+          value: -Xmx6G
+        - name: GRADLE_USER_HOME
+          value: /android-workspace/router-gradle-home
+        - name: GRADLE_OPTS
+          value: -Dorg.gradle.jvmargs=-Xmx2G
+      volumeMounts:
+        - name: android-workspace
+          mountPath: /android-workspace
+      resources:
+        requests:
+          cpu: '2'
+          memory: 8Gi
+      securityContext:
+        runAsUser: 0
+  volumes:
+    - name: android-workspace
+      persistentVolumeClaim:
+        claimName: pvc-android-workspace
+    - name: github-mirror
+      persistentVolumeClaim:
+        claimName: pvc-github-mirror

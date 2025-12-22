@@ -1,0 +1,39 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+// 这里的 java 11 设置会保持一致
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+    withSourcesJar() // Maven Central 强制要求包含源码
+    withJavadocJar()
+}
+
+// 统一 Kotlin 编译目标版本
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
+dependencies {
+    // 引用根目录 ext 中定义的变量
+    implementation rootProject.ext.kotlin_stdlib
+}
+
+def customizePom = rootProject.ext.customizePom
+// 发布配置
+publishing {
+    publications {
+        release(MavenPublication) {
+            // 将 java 组件（jar包、依赖信息）加入发布内容
+            from components.java
+
+            // 覆盖 artifactId 为特定名称
+            artifactId = 'router-annotation'
+
+            // 调用根目录定义的 POM 补充函数
+            customizePom(pom)
+        }
+    }
+}

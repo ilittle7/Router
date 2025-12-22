@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ilittle7.testmodule" >
+
+    <application>
+        <activity android:name="com.ilittle7.testmodule.TestModuleActivity" />
+    </application>
+</manifest>
