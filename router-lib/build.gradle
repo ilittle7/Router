@@ -1,0 +1,73 @@
+apply plugin: 'com.android.library'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+android {
+    namespace = "com.ilittle7.router.lib"
+
+    compileSdk rootProject.ext.compile_sdk
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.min_sdk
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+
+    // 核心：配置 Android 发布选项
+    publishing {
+        singleVariant('release') {
+            // 自动打包源代码 jar 包，Maven Central 强制要求
+            withSourcesJar()
+            // 如果你需要打包 javadoc，可以添加 withJavadocJar()
+            withJavadocJar()
+        }
+    }
+
+    libraryVariants.all {
+        generateBuildConfigProvider?.get()?.enabled = false
+    }
+
+    lintOptions {
+        textReport true
+        textOutput 'stdout'
+    }
+}
+
+dependencies {
+    // 使用根目录 ext 变量
+    implementation rootProject.ext.kotlin_stdlib
+
+    implementation project(':router-annotation')
+
+    // 只有在发布时才包含的 lint 规则
+    lintPublish project(':router-lint')
+
+    compileOnly project(':router-compile-only')
+    compileOnly 'androidx.appcompat:appcompat:1.2.0'
+}
+
+// 发布配置
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // 使用 Android release 变体组件
+                from components.release
+
+                artifactId = 'router-lib'
+
+                // 调用根目录定义的 POM 补充函数
+                rootProject.ext.customizePom(pom)
+
+                // 特殊处理：如果有些依赖不想出现在 POM 里，可以在这里微调
+                // 但通常 project(':router-annotation') 会被正确处理
+            }
+        }
+    }
+}
