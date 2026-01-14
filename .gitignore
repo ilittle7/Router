@@ -249,3 +249,5 @@ fabric.properties
 /.idea/misc.xml
 /.idea/jarRepositories.xml
 /.idea/codeStyles/
+/bundleRepo
+router-bundle.zip

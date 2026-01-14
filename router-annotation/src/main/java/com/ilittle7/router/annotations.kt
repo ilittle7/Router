@@ -40,3 +40,11 @@ annotation class FallbackInterceptor
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.CLASS)
 annotation class RouterBaseUri(val baseUri: String)
+
+@Deprecated("Internal use only", level = DeprecationLevel.HIDDEN)
+@Retention(AnnotationRetention.BINARY)
+@Target(AnnotationTarget.CLASS)
+annotation class GeneratedMetadata(
+    val type: String,
+    val targetClass: KClass<*>
+)

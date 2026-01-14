@@ -1,17 +1,13 @@
 package com.ilittle7.router.transform;
 
-
-import android.text.TextUtils;
 import android.util.Log;
-
 import androidx.annotation.NonNull;
-
 import com.ilittle7.router.AbsRouterManager;
+import com.ilittle7.router.IRouterConfig;
 import com.ilittle7.router.RouterTree;
-
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ServiceLoader;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -25,36 +21,50 @@ public class ActualRouterManager extends AbsRouterManager {
     private static ArrayList fallbackInterceptorList = new ArrayList();
     private static TreeMap sortedRouterMap = new TreeMap();
     private static RouterTree routerPathTree = RouterTree.emptyTree();
+    private static String actualBaseUri = null;
+
+    private static boolean loaded = false;
 
     public static ActualRouterManager create() {
-        loadAll();
+        if (!loaded) {
+            loadAll();
+            loaded = true;
+        }
         return new ActualRouterManager(globalInterceptorList, fallbackInterceptorList, sortedRouterMap, routerPathTree);
     }
 
-    public static void loadAll() {
+    public static String getActualBaseUri() {
+        if (!loaded) {
+            loadAll();
+            loaded = true;
+        }
+        return actualBaseUri;
     }
 
-    public static void register(String className) {
-        Log.i("ActualRouterManager", "register  className:" + className);
-        if (!TextUtils.isEmpty(className)) {
-            try {
-                Class<?> objectClass = Class.forName(className);
-                Field instanceField = objectClass.getDeclaredField("INSTANCE");
-                instanceField.setAccessible(true);
-                Object obj = instanceField.get(null);
-
-                if (obj instanceof AbsRouterManager) {
-                    AbsRouterManager manager = (AbsRouterManager) obj;
-                    globalInterceptorList.addAll(manager.getGlobalInterceptorList());
-                    fallbackInterceptorList.addAll(manager.getFallbackInterceptorList());
-                    sortedRouterMap.putAll(manager.getSortedRouterMap());
-                    routerPathTree.merge(manager.getRouterPathTree());
-                    Log.i("ActualRouterManager", "register  success");
-                }
-            } catch (Exception e) {
-                Log.i("ActualRouterManager", "register  error");
-                e.printStackTrace();
+    /**
+     * 使用 ServiceLoader 自动聚合所有模块的路由和配置
+     */
+    public static void loadAll() {
+        try {
+            // 1. 聚合路由表
+            ServiceLoader<AbsRouterManager> loader = ServiceLoader.load(AbsRouterManager.class, AbsRouterManager.class.getClassLoader());
+            for (AbsRouterManager manager : loader) {
+                globalInterceptorList.addAll(manager.getGlobalInterceptorList());
+                fallbackInterceptorList.addAll(manager.getFallbackInterceptorList());
+                sortedRouterMap.putAll(manager.getSortedRouterMap());
+                routerPathTree.merge(manager.getRouterPathTree());
             }
+
+            // 2. 聚合全局配置 (BaseUri)
+            ServiceLoader<IRouterConfig> configLoader = ServiceLoader.load(IRouterConfig.class, IRouterConfig.class.getClassLoader());
+            for (IRouterConfig config : configLoader) {
+                if (actualBaseUri == null && config.getBaseUri() != null) {
+                    actualBaseUri = config.getBaseUri();
+                }
+            }
+            Log.i("ActualRouterManager", "ServiceLoader aggregation completed");
+        } catch (Exception e) {
+            Log.e("ActualRouterManager", "ServiceLoader error", e);
         }
     }
 
@@ -65,25 +75,14 @@ public class ActualRouterManager extends AbsRouterManager {
 
     @NonNull
     @Override
-    public String getPathParamKey() {
-        return pathParamKey;
-    }
-
+    public String getPathParamKey() { return pathParamKey; }
     @NonNull
     @Override
-    public String getPostPathSegmentKey() {
-        return postPathSegmentKey;
-    }
-
+    public String getPostPathSegmentKey() { return postPathSegmentKey; }
     @NonNull
     @Override
-    public String getActivityOptionKey() {
-        return activityOptionKey;
-    }
-
+    public String getActivityOptionKey() { return activityOptionKey; }
     @NonNull
     @Override
-    public String getDialogFragmentIntentKey() {
-        return dialogFragmentIntentKey;
-    }
+    public String getDialogFragmentIntentKey() { return dialogFragmentIntentKey; }
 }

@@ -2,7 +2,6 @@ package com.ilittle7.router
 
 import android.net.Uri
 import android.util.Log
-import com.ilittle7.router.gen.RouterConfig
 import com.ilittle7.router.transform.ActualRouterManager
 
 internal const val TAG = "Router"
@@ -16,13 +15,11 @@ internal val routerManager = try {
 }
 
 internal val baseUri: Uri by lazy {
-    try {
-        Uri.parse(RouterConfig.baseUri)
-    } catch (e: Throwable) {
+    val finalBaseUri = ActualRouterManager.getActualBaseUri()
+    finalBaseUri?.let { Uri.parse(it) } ?: run {
         Log.w(
             TAG,
-            "No baseUri be found, maybe you should add a @RouterBaseUri annotation on any class.",
-            e
+            "No baseUri be found, maybe you should add a @RouterBaseUri annotation on any class."
         )
         Uri.parse("")
     }

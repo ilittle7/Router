@@ -87,6 +87,12 @@
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="testModuleDialogFragmentRouter"
+            android:text="start dialog fragment" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:onClick="testResponseMessage"
             android:text="Test response message" />
 

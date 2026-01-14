@@ -100,6 +100,10 @@ class MainActivity : AppCompatActivity() {
         route(Intent(this, TestDialogFragment::class.java))
     }
 
+    fun testModuleDialogFragmentRouter(view: View) {
+        route("/module/dialog/test")
+    }
+
     fun testResponseMessage(view: View) {
         val response = route("/test/error/message")
         Toast.makeText(view.context, response.message.orEmpty(), Toast.LENGTH_SHORT).show()
