@@ -2,16 +2,14 @@ apply plugin: 'java-library'
 apply plugin: 'kotlin'
 
 dependencies {
-    def lintVersion = '26.5.3'
-    compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    def lintVersion = '30.4.2' // 升级 lint 版本以更好地支持 Kotlin 1.9
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:1.9.0"
     compileOnly "com.android.tools.lint:lint-api:$lintVersion"
     compileOnly "com.android.tools.lint:lint-checks:$lintVersion"
 }
 
 jar {
     manifest {
-        // Only use the "-v2" key here if your checks have been updated to the
-        // new 3.0 APIs (including UAST)
         attributes("Lint-Registry-v2": "com.ilittle7.router.RouterIssueRegistry")
     }
 }

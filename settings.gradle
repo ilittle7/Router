@@ -14,5 +14,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-include ':app', ':testmodule', ':router-compile-only', ':router-lib', ':router-processor', ':router-annotation', ':router-lint', ':router-plugin'
+include ':app', ':testmodule', ':router-lib', ':router-processor', ':router-annotation', ':router-lint'
 rootProject.name = 'Router'

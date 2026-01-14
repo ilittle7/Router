@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import com.ilittle7.router.action.NoPathAction
 import com.ilittle7.router.action.TestToastAction
@@ -26,7 +27,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun testA(view: View) {
-        route(Uri.parse("/testa/111?userToken=someToken"))
+//        route(Uri.parse("/testa/111?userToken=someToken"))
+        route("/login")
     }
 
     fun testB(view: View) {
@@ -45,14 +47,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun testRouterAction(view: View) {
+        testRouterAction2(view)
         route("/testToastAction")
         route(Intent(this, TestToastAction::class.java))
     }
 
+    fun testRouterAction2(view: View) {
+        route("/tta1")
+        route("/tta2")
+        route("/tta3")
+        route("/tta4")
+    }
+
     fun testRouterService(view: View) {
-        application.route(Intent(application, TestAService::class.java))
-        application.route(Intent(application, TestBService::class.java))
-        application.route(Intent(application, TestCService::class.java))
+        val uri = "/service-a".toUri().buildUpon()
+            .appendQueryParameter("test", "test")
+            .appendQueryParameter("test2", "test2")
+            .appendQueryParameter("test3", "test3")
+            .build()
+//        application.route(Intent(application, TestAService::class.java))
+//        application.route(Intent(application, TestBService::class.java))
+//        application.route(Intent(application, TestCService::class.java))
+        route(uri)
     }
 
     fun testModuleJump(view: View) {
@@ -98,6 +114,10 @@ class MainActivity : AppCompatActivity() {
         Fragment().route("/dialog/test")
         route("/dialog/test")
         route(Intent(this, TestDialogFragment::class.java))
+    }
+
+    fun testModuleDialogFragmentRouter(view: View) {
+        route("/module/dialog/test")
     }
 
     fun testResponseMessage(view: View) {

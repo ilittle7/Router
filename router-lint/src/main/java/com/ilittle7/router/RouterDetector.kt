@@ -1,7 +1,6 @@
 package com.ilittle7.router
 
 import com.android.tools.lint.detector.api.*
-import com.ilittle7.router.RouterDetector.Issues.*
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
 
@@ -16,7 +15,7 @@ class RouterDetector : Detector(), Detector.UastScanner {
             context.evaluator.isMemberInClass(this, className)
 
         fun reportStartActivity() = context.report(
-            START_ACTIVITY.issue,
+            Issues.START_ACTIVITY,
             node,
             context.getLocation(node),
             """Use 'route' instead of 'startActivity'""",
@@ -28,7 +27,7 @@ class RouterDetector : Detector(), Detector.UastScanner {
         )
 
         fun reportStartActivityForResult() = context.report(
-            START_ACTIVITY_FOR_RESULT.issue,
+            Issues.START_ACTIVITY_FOR_RESULT,
             node,
             context.getLocation(node),
             """Use 'routeForResult' instead of 'startActivityForResult'""",
@@ -40,7 +39,7 @@ class RouterDetector : Detector(), Detector.UastScanner {
         )
 
         fun reportStartService() = context.report(
-            START_SERVICE.issue,
+            Issues.START_SERVICE,
             node,
             context.getLocation(node),
             """Use 'route' instead of 'startService' with an uri or intent"""
@@ -59,39 +58,37 @@ class RouterDetector : Detector(), Detector.UastScanner {
         }
     }
 
-    enum class Issues(val issue: Issue) {
-        START_ACTIVITY(
-            Issue.create(
-                "RouterStartActivity",
-                "Use router to start activity.",
-                "Use router to start the activity.",
-                Category.CORRECTNESS,
-                5,
-                Severity.WARNING,
-                Implementation(RouterDetector::class.java, Scope.JAVA_FILE_SCOPE)
-            )
-        ),
-        START_ACTIVITY_FOR_RESULT(
-            Issue.create(
-                "RouterStartActivityForResult",
-                "Use router to start activity for result.",
-                "Use Router to start the activity for result.",
-                Category.CORRECTNESS,
-                5,
-                Severity.WARNING,
-                Implementation(RouterDetector::class.java, Scope.JAVA_FILE_SCOPE)
-            )
-        ),
-        START_SERVICE(
-            Issue.create(
-                "RouterStartService",
-                "Use router to start the service.",
-                "Use router to start the service.",
-                Category.CORRECTNESS,
-                5,
-                Severity.WARNING,
-                Implementation(RouterDetector::class.java, Scope.JAVA_FILE_SCOPE)
-            )
+    object Issues {
+        val START_ACTIVITY = Issue.create(
+            "RouterStartActivity",
+            "Use router to start activity.",
+            "Use router to start the activity.",
+            Category.CORRECTNESS,
+            5,
+            Severity.WARNING,
+            Implementation(RouterDetector::class.java, Scope.JAVA_FILE_SCOPE)
         )
+
+        val START_ACTIVITY_FOR_RESULT = Issue.create(
+            "RouterStartActivityForResult",
+            "Use router to start activity for result.",
+            "Use Router to start the activity for result.",
+            Category.CORRECTNESS,
+            5,
+            Severity.WARNING,
+            Implementation(RouterDetector::class.java, Scope.JAVA_FILE_SCOPE)
+        )
+
+        val START_SERVICE = Issue.create(
+            "RouterStartService",
+            "Use router to start the service.",
+            "Use router to start the service.",
+            Category.CORRECTNESS,
+            5,
+            Severity.WARNING,
+            Implementation(RouterDetector::class.java, Scope.JAVA_FILE_SCOPE)
+        )
+        
+        fun all() = listOf(START_ACTIVITY, START_ACTIVITY_FOR_RESULT, START_SERVICE)
     }
 }

@@ -18,19 +18,21 @@ Router是一个根据uri来开启一个Activity或者执行一个行为的框架
 接下来在工程中的每个使用Router的module的`build.gradle`里面添加如下依赖：
 ```groovy
 dependencies {
-    implementation 'io.github.ilittle7:router-lib:1.3.0'
-    implementation 'io.github.ilittle7:router-annotation:1.3.0'
-    kapt 'io.github.ilittle7:router-processor:1.3.0'
+    implementation 'io.github.ilittle7:router-lib:2.2.1'
+    implementation 'io.github.ilittle7:router-annotation:2.2.1'
+    ksp 'io.github.ilittle7:router-processor:2.2.1'
 }
 ```
-在使用kapt的module的*build.gradle*中，添加kapt插件：
+在顶层的`build.gradle`中，添加ksp插件：
+
+> **注意**：KSP 版本的前一部分必须与 build 中使用的 Kotlin 版本一致。例如，如果您使用的是 Kotlin 2.0.21，则 KSP 版本必须是 2.0.21-x.y.z 版本之一。
+
 ```groovy
-apply plugin: 'kotlin-kapt'
+plugins {
+    id 'com.google.devtools.ksp' version '2.0.21-1.0.27' apply false
+}
 ```
-在app模块的*build.gradle*中添加router插件：
-```groovy
-apply plugin: 'butter-router'
-```
+
 ### API
 
 #### Router

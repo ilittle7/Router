@@ -6,7 +6,7 @@ import android.os.IBinder
 import com.ilittle7.router.Router
 import timber.log.Timber
 
-@Router
+@Router(path = ["/service-a"])
 class TestAService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 

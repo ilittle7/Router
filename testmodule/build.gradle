@@ -1,11 +1,12 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 
 android {
-    compileSdk compile_sdk
+    namespace = "com.ilittle7.testmodule"
+    compileSdk rootProject.ext.compile_sdk
     defaultConfig {
-        minSdkVersion min_sdk
+        minSdk rootProject.ext.min_sdk
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -19,10 +20,12 @@ android {
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.core:core-ktx:1.12.0'
-    implementation project(path: ':router-lib')
-    implementation project(path: ':router-annotation')
-    kapt project(path: ':router-processor')
-//    implementation 'io.github.ilittle7:router-lib:1.2.6'
-//    implementation 'io.github.ilittle7:router-annotation:1.2.6'
-//    kapt 'io.github.ilittle7:router-processor:1.2.6'
+
+//    implementation project(':router-lib')
+//    implementation project(':router-annotation')
+//    ksp project(':router-processor')
+
+    implementation 'io.github.ilittle7:router-lib:2.2.1'
+    implementation 'io.github.ilittle7:router-annotation:2.2.1'
+    ksp 'io.github.ilittle7:router-processor:2.2.1'
 }
